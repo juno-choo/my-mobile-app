@@ -1,29 +1,58 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+// app/_layout.tsx
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import { ActivityIndicator, Text } from "react-native"; // Make sure Text is imported
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+// import { useEffect } from "react"; // Temporarily disable
+// import * as SplashScreen from 'expo-splash-screen'; // Temporarily disable
+
+// SplashScreen.preventAutoHideAsync(); // Temporarily disable
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  const [fontsLoaded, fontError] = useFonts({
+    Virgil: require("../assets/fonts/Virgil.ttf"),
   });
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
+  /* // Temporarily disable the entire useEffect hook
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+  */
+
+  // --- We are keeping the debugging logic ---
+  if (fontError) {
+    console.error("Font loading error:", fontError);
+    return <Text>Error loading fonts. Check the terminal.</Text>;
+  }
+
+  // If fonts are not yet loaded, show the spinner
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" />;
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "my-apps",
+          headerTitleAlign: "left",
+          headerStyle: { backgroundColor: "#fff" },
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontFamily: "Virgil", // We can re-add this later
+            fontSize: 22,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="holy-streak-tracker"
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack>
   );
 }
